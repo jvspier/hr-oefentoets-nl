@@ -7,6 +7,7 @@
 <title>Oefentoetsen Basis Nederlands</title>
 <style>
 :root{
+  --w:1240px; --pad:clamp(16px,3vw,40px);
   --red:#E2001A; --red-dark:#B30015; --red-soft:#FDE8EA;
   --ink:#1D1D1B; --ink-2:#55554F; --line:#DEDEDA; --paper:#FFFFFF; --mist:#F4F4F2;
   --ok:#1E7B3A; --ok-soft:#E3F3E7; --bad:#C4001A; --bad-soft:#FDE8EA;
@@ -34,7 +35,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 /* Top bar: the HR red block */
 .bar{background:var(--red);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--red);z-index:11}
-.bar-in{max-width:760px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;min-height:56px}
+.bar-in{max-width:var(--w);margin:0 auto;padding:12px var(--pad);display:flex;align-items:center;gap:14px;min-height:56px}
 .logo{font-weight:800;font-size:1.05rem;letter-spacing:-.01em;line-height:1.1;background:none;border:0;padding:0;color:#fff;text-align:left}
 .logo small{display:block;font-weight:500;font-size:.78rem;opacity:.9}
 .bar-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums;font-weight:600}
@@ -42,25 +43,31 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bar-btn:hover{background:rgba(255,255,255,.28)}
 .timer.low{background:#fff;color:var(--red-dark);border-radius:6px;padding:2px 8px}
 
-main{max-width:760px;margin:0 auto;padding:22px 18px 120px}
+main{max-width:var(--w);margin:0 auto;padding:clamp(20px,3vw,36px) var(--pad) 120px}
+main.narrow{max-width:980px}
 h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.1;letter-spacing:-.02em;margin:.2em 0 .35em;font-weight:800}
 h2{font-size:1.15rem;margin:1.8em 0 .6em;font-weight:700}
 p.lead{color:var(--ink-2);margin:0 0 1.2em;max-width:60ch}
 
 /* Home */
-.versions{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
-.vbtn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:14px 14px 12px;text-align:left;transition:border-color .15s}
-.vbtn:hover{border-color:var(--red)}
-.vbtn b{display:block;font-size:1.25rem}
-.vbtn span{font-size:.85rem;color:var(--ink-2)}
-.vbtn .best{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;color:var(--ok)}
-.mix{display:grid;gap:10px}
+.versions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:999px){.versions{gap:10px}.vbtn{padding:14px;min-height:130px}.vtxt b{font-size:1rem}.vtxt .vn{display:none}}
+@media (max-width:759px){.versions{grid-template-columns:1fr}.vtxt .vn{display:inline}}
+.vbtn{display:flex;flex-direction:column;align-items:flex-start;gap:14px;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:18px;text-align:left;min-height:150px;transition:border-color .15s,background .15s}
+.vbtn:hover{border-color:var(--red);background:var(--red-soft)}
+.vnum{width:46px;height:46px;border-radius:10px;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.vtxt b{display:block;font-size:1.15rem;line-height:1.2;white-space:nowrap}
+.vtxt > span{display:block;font-size:.88rem;color:var(--ink-2)}
+.vtxt .best{margin-top:4px;font-weight:700;color:var(--ok)}
+@media (max-width:759px){.vbtn{flex-direction:row;align-items:center;min-height:0;padding:14px 16px}.vnum{width:40px;height:40px;font-size:1.2rem}}
+.mix{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .mixbtn{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left}
 .mixbtn:hover{border-color:var(--red)}
 .mixbtn .ico{flex:none;width:40px;height:40px;border-radius:8px;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.1rem}
-.mixbtn strong{display:block}
+.mixbtn strong{display:block;color:var(--ink);font-size:1.02rem}
 .mixbtn span{font-size:.88rem;color:var(--ink-2)}
 .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:1000px){.cats{grid-template-columns:repeat(4,1fr)}}
 @media (max-width:480px){.cats{grid-template-columns:1fr}}
 .catbtn{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--cc);border-radius:10px;padding:12px 14px;text-align:left}
 .catbtn:hover{border-color:var(--cc)}
@@ -69,9 +76,15 @@ p.lead{color:var(--ink-2);margin:0 0 1.2em;max-width:60ch}
 .opts{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:14px}
 .opts label{display:flex;gap:10px;align-items:center;cursor:pointer}
 .opts input{width:20px;height:20px;accent-color:var(--red)}
-.note{font-size:.85rem;color:var(--ink-2);margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+.note{font-size:.85rem;color:var(--ink-2);margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
 
-.exam{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--red);border-radius:10px;padding:14px 16px;font-size:.95rem;display:grid;gap:6px;max-width:60ch}
+.exam{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:10px;font-size:.95rem}
+.exam summary{cursor:pointer;padding:12px 16px;font-weight:700}
+.exam-body{display:grid;gap:6px;padding:0 16px 14px;max-width:70ch}
+.split{display:grid;gap:0 40px}
+@media (min-width:1000px){.split{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.review{grid-template-columns:1fr 1fr;align-items:start}}
+@media (min-width:900px){.results-top{display:grid;grid-template-columns:minmax(260px,.8fr) 1.2fr;gap:40px;align-items:end}.results-top h2{margin-top:0}}
 .exam ul{list-style:none;margin:2px 0;padding:0;display:grid;gap:4px}
 .exam li{display:flex;align-items:center;gap:8px}
 .exam li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--cc);flex:none}
@@ -102,7 +115,7 @@ p.lead{color:var(--ink-2);margin:0 0 1.2em;max-width:60ch}
 .feedback.ok b{color:var(--ok)} .feedback.no b{color:var(--bad)}
 
 .nav{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);z-index:9;padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:760px;margin:0 auto;padding:10px 18px;display:flex;gap:10px;align-items:center}
+.nav-in{max-width:980px;margin:0 auto;padding:10px var(--pad);display:flex;gap:10px;align-items:center}
 .btn{border-radius:8px;padding:12px 18px;font-weight:700;border:2px solid var(--line);background:var(--paper);min-height:48px}
 .btn:hover{border-color:var(--ink-2)}
 .btn.primary{background:var(--red);border-color:var(--red);color:#fff}
@@ -114,7 +127,7 @@ p.lead{color:var(--ink-2);margin:0 0 1.2em;max-width:60ch}
 /* Question overview sheet */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:none;align-items:flex-end;justify-content:center}
 .sheet.open{display:flex}
-.sheet-in{background:var(--paper);width:100%;max-width:760px;max-height:80vh;overflow:auto;border-radius:14px 14px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet-in{background:var(--paper);width:100%;max-width:980px;max-height:80vh;overflow:auto;border-radius:14px 14px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .dots{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
 .dot{height:42px;border-radius:6px;border:2px solid var(--line);background:var(--paper);font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums;border-bottom:4px solid var(--cc)}
@@ -233,36 +246,44 @@ function buildCategory(cid, size){
 
 /* ---------- Home ---------- */
 function renderHome(){
+  $('#app').classList.remove('narrow');
   stopTimer(); S = null;
   $('#barRight').innerHTML = '';
   const best = store.get('best', {});
   const wrong = store.get('wrong', []);
   const timedPref = store.get('timed', false);
   $('#app').innerHTML = `
-    <h1>Oefenen voor de toets Basis Nederlands</h1>
-    <p class="lead">Aan het eind zie je je cijfer, je score per onderdeel en bij elke vraag waarom het goede antwoord goed is.</p>
-    <div class="exam"><strong>Zo ziet het echte tentamen eruit</strong>
-      <span>Digitaal in het computerlokaal, 60 minuten, 80 meerkeuzevragen:</span>
-      <ul>${CATS.map(c => `<li style="--cc:${c.color}">${c.name}<b>${c.to - c.from + 1} vragen</b></li>`).join('')}</ul>
-      <span>Je bent geslaagd met minimaal 57 van de 80 goed (71%), dat is een 5,5. De oefentoetsen hebben dezelfde opbouw en cijfertabel.</span></div>
+    <h1>Oefentoetsen Basis Nederlands</h1>
+    <p class="lead">Kies een oefentoets. Aan het eind zie je je cijfer, je score per onderdeel en bij elke vraag waarom het goede antwoord goed is.</p>
 
-    <h2>De vijf oefentoetsen</h2>
     <div class="versions">
-      ${[1,2,3,4,5].map(v => `<button class="vbtn" data-v="${v}"><b>Versie ${v}</b><span>80 vragen</span>${best['v'+v] != null ? `<br><span class="best">Beste cijfer ${fmt(best['v'+v])}</span>` : ''}</button>`).join('')}
+      ${[1,2,3,4,5].map(v => `<button class="vbtn" data-v="${v}">
+        <span class="vnum">${v}</span>
+        <span class="vtxt"><b>Oefentoets<span class="vn"> ${v}</span></b><span>80 vragen</span>${best['v'+v] != null ? `<span class="best">Beste cijfer ${fmt(best['v'+v])}</span>` : ''}</span>
+      </button>`).join('')}
     </div>
     <div class="opts"><label><input type="checkbox" id="timed" ${timedPref ? 'checked' : ''}> Met tijdslimiet van 60 minuten, zoals bij het echte tentamen</label></div>
 
-    <h2>Nieuwe toetsen</h2>
+    <h2>Meer oefenen</h2>
     <div class="mix">
-      <button class="mixbtn" id="mixed"><span class="ico">⟳</span><span><strong>Nieuwe gemixte toets</strong><span>80 willekeurige vragen uit alle vijf de versies, in dezelfde verdeling als het tentamen. Elke keer anders.</span></span></button>
+      <button class="mixbtn" id="mixed"><span class="ico">⟳</span><span><strong>Nieuwe gemixte toets</strong><span>80 willekeurige vragen uit alle vijf de oefentoetsen, in dezelfde verdeling als het tentamen. Elke keer anders.</span></span></button>
       ${wrong.length ? `<button class="mixbtn" id="retry"><span class="ico">${wrong.length}</span><span><strong>Oefen je fouten</strong><span>Alle vragen die je eerder fout had. Goed beantwoorde vragen vallen van de lijst af.</span></span></button>` : ''}
     </div>
 
     <h2>Eén onderdeel oefenen</h2>
     <p class="lead" style="margin-bottom:10px">20 willekeurige vragen. Je ziet na elke vraag meteen of je het goed had.</p>
     <div class="cats">
-      ${CATS.map(c => `<button class="catbtn" data-c="${c.id}" style="--cc:${c.color}"><strong>${c.name}</strong><span>Vragen uit alle vijf de versies</span></button>`).join('')}
+      ${CATS.map(c => `<button class="catbtn" data-c="${c.id}" style="--cc:${c.color}"><strong>${c.name}</strong><span>Vragen uit alle vijf de oefentoetsen</span></button>`).join('')}
     </div>
+
+    <details class="exam">
+      <summary>Zo ziet het echte tentamen eruit</summary>
+      <div class="exam-body">
+        <span>Digitaal in het computerlokaal, 60 minuten, 80 meerkeuzevragen:</span>
+        <ul>${CATS.map(c => `<li style="--cc:${c.color}">${c.name}<b>${c.to - c.from + 1} vragen</b></li>`).join('')}</ul>
+        <span>Je bent geslaagd met minimaal 57 van de 80 goed (71%), dat is een 5,5. De oefentoetsen hebben dezelfde opbouw en cijfertabel.</span>
+      </div>
+    </details>
 
     <p class="note">De uitleg bij de antwoorden is als hulp toegevoegd en komt niet van de docent. Het antwoordenblad van de opleiding blijft leidend. Je voortgang wordt alleen in deze browser bewaard.</p>
   `;
@@ -291,6 +312,7 @@ function renderBar(){
   updateTimer();
 }
 function renderQuiz(){
+  $('#app').classList.add('narrow');
   const q = S.questions[S.i], c = CAT[q.c], a = S.answers[S.i];
   const shown = S.practice && S.revealed[S.i];
   renderBar();
@@ -397,6 +419,7 @@ function finish(){
   renderResults(correct, total, grade);
 }
 function renderResults(correct, total, grade){
+  $('#app').classList.remove('narrow');
   $('#barRight').innerHTML = '';
   const qs = S.questions;
   const per = CATS.map(c => {
@@ -405,13 +428,13 @@ function renderResults(correct, total, grade){
   }).filter(r => r.n);
   const pass = grade >= 5.5;
   $('#app').innerHTML = `
-    <p class="qnum" style="margin:0">${esc(S.title)}</p>
+    <div class="results-top"><div><p class="qnum" style="margin:0">${esc(S.title)}</p>
     <div class="score">
       <div class="grade ${pass ? 'pass' : ''}">${fmt(grade)}</div>
       <div class="score-txt"><b>${correct} van ${total} goed</b><span>${pass ? 'Voldoende, je zou geslaagd zijn.' : 'Nog niet voldoende. Je hebt minimaal 57 van de 80 goed nodig (71%).'}${total !== 80 ? ' Cijfer omgerekend naar een toets van 80 vragen.' : ''}</span></div>
     </div>
-    <h2>Per onderdeel</h2>
-    <div class="catrows">${per.map(r => `<div class="catrow" style="--cc:${r.c.color}"><span>${r.c.name}</span><div class="meter"><i style="width:${r.ok / r.n * 100}%"></i></div><span class="n">${r.ok}/${r.n}</span></div>`).join('')}</div>
+    </div><div><h2>Per onderdeel</h2>
+    <div class="catrows">${per.map(r => `<div class="catrow" style="--cc:${r.c.color}"><span>${r.c.name}</span><div class="meter"><i style="width:${r.ok / r.n * 100}%"></i></div><span class="n">${r.ok}/${r.n}</span></div>`).join('')}</div></div></div>
     <div class="actions">
       ${correct < total ? `<button class="btn primary" id="again">Oefen deze ${total - correct} fouten opnieuw</button>` : ''}
       <button class="btn" id="toHome">Terug naar het overzicht</button>
