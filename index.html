@@ -217,7 +217,7 @@ html{overflow-x:clip}
 #app.in-up{animation:fadeUp .4s cubic-bezier(.2,.7,.2,1)}
 #app.in-next{animation:slideFromRight .3s cubic-bezier(.2,.7,.2,1)}
 #app.in-prev{animation:slideFromLeft .3s cubic-bezier(.2,.7,.2,1)}
-.stagger>*{animation:fadeUp .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 45ms)}
+.stagger>*{animation:fadeUp .45s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 45ms)}
 
 /* cards lift a little on hover, press down on tap */
 .vbtn,.mixbtn,.catbtn,.hrow{transition:border-color .15s,background .15s,transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s}
@@ -255,7 +255,7 @@ html{overflow-x:clip}
 /* results */
 .grade.anim{animation:gradeIn .6s cubic-bezier(.2,.8,.2,1) both}
 .meter i{transition:width .9s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 90ms + .15s)}
-.review>*{animation:fadeUp .35s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 35ms)}
+.review>*{animation:fadeUp .35s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 35ms)}
 
 /* smooth colour change when switching theme */
 html.theme-anim,html.theme-anim *,html.theme-anim *::before{transition:background-color .35s ease,border-color .35s ease,color .35s ease,fill .35s ease!important}
@@ -285,7 +285,7 @@ function enter(dir){
   void app.offsetWidth; app.classList.add('in-' + dir);
 }
 // give children of a container an index so they appear one after another
-function stagger(sel, max = 12){ document.querySelectorAll(sel).forEach(box => [...box.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, max)))); }
+function stagger(sel, max = 12){ document.querySelectorAll(sel).forEach(box => { box.classList.add('stagger'); return [...box.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, max))); }); }
 // count a number up from `from` to `to`
 function countUp(el, from, to, ms, format){
   if (!el) return;
@@ -400,8 +400,8 @@ function restartSession(){
 }
 function confirmRestart(){
   if (S && !S.done && S.answers.some(a => a != null) && !confirm('Opnieuw beginnen? Je antwoorden van deze poging worden gewist.')) return;
-  replayAnim($('#restart'), 'spin');
   restartSession();
+  replayAnim($('#restart'), 'spin');
 }
 
 /* ---------- History (stored per browser) ---------- */
