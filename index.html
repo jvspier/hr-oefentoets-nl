@@ -72,7 +72,18 @@ p.lead.center{margin:0 auto 1.6em}
 .vnum{width:46px;height:46px;border-radius:10px;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
 .vtxt b{display:block;font-size:1.15rem;line-height:1.2;white-space:nowrap}
 .vtxt > span{display:block;font-size:.88rem;color:var(--ink-2)}
-.vtxt .best{margin-top:4px;font-weight:700;color:var(--ok)}
+.vtxt .vscore{margin-top:2px;font-weight:600;color:var(--ink-2)}
+.vtxt i, .hgrade{font-style:normal;font-weight:800;font-variant-numeric:tabular-nums}
+i.pass,.hgrade.pass{color:var(--ok)} i.fail,.hgrade.fail{color:var(--bad)}
+.hist{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}
+.hrow{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;text-align:left;width:100%}
+.hgrade{font-size:1.5rem;min-width:2.4em}
+.hmain{flex:1;min-width:0}.hmain b{display:block}.hmain span{font-size:.85rem;color:var(--ink-2)}
+.hgo{font-size:.85rem;font-weight:700;color:var(--red)}
+@media (hover:hover){.hrow:hover{border-color:var(--red)}}
+.hist-actions{display:flex;gap:18px;margin-top:10px}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--ink-2);font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
+@media (hover:hover){.linkbtn:hover{color:var(--ink)}}
 @media (max-width:759px){.vbtn{flex-direction:row;align-items:center;min-height:0;padding:14px 16px}.vnum{width:40px;height:40px;font-size:1.2rem}}
 .mix{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .mixbtn{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left}
@@ -281,12 +292,53 @@ function buildCategory(cid, size){
   return pick;
 }
 
+/* ---------- History (stored per browser) ---------- */
+const BYID = Object.fromEntries(DATA.map(q => [q.id, q]));
+const getHist = () => store.get('hist', []);
+function saveAttempt(a){ const h = getHist(); h.unshift(a); store.set('hist', h.slice(0, 100)); }
+const fmtDate = t => new Date(t).toLocaleString('nl-NL', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+const gradeCls = g => g >= 5.5 ? 'pass' : 'fail';
+function versionStats(v){
+  const list = getHist().filter(a => a.key === 'v' + v);
+  if (!list.length) { const old = store.get('best', {})['v' + v]; return old != null ? { n: 0, best: old, last: null } : null; }
+  return { n: list.length, best: Math.max(...list.map(a => a.grade)), last: list[0].grade };
+}
+function openAttempt(idx){
+  const a = getHist()[idx]; if (!a) return;
+  const qs = a.ids.map(id => BYID[id]).filter(Boolean);
+  S = { title: a.title, key: a.key, questions: qs, answers: a.ans.slice(0, qs.length), i: 0, practice: a.practice,
+        revealed: [], done: true, filter: a.correct === a.total ? 'all' : 'wrong', when: a.t };
+  renderResults(a.correct, a.total, a.grade);
+}
+function historyHTML(showAll){
+  const h = getHist(); if (!h.length) return '';
+  const rows = (showAll ? h : h.slice(0, 8)).map((a, i) => `
+    <button class="hrow" data-i="${i}">
+      <span class="hgrade ${gradeCls(a.grade)}">${fmt(a.grade)}</span>
+      <span class="hmain"><b>${esc(a.title)}</b><span>${fmtDate(a.t)} · ${a.correct} van ${a.total} goed</span></span>
+      <span class="hgo">Bekijk</span>
+    </button>`).join('');
+  return `<h2>Jouw resultaten</h2>
+    <div class="hist">${rows}</div>
+    <div class="hist-actions">
+      ${h.length > 8 ? `<button class="linkbtn" id="histAll">${showAll ? 'Toon minder' : `Toon alle ${h.length}`}</button>` : ''}
+      <button class="linkbtn" id="histClear">Wis mijn resultaten</button>
+    </div>`;
+}
+function bindHistory(showAll){
+  document.querySelectorAll('.hrow').forEach(b => b.onclick = () => openAttempt(+b.dataset.i));
+  if ($('#histAll')) $('#histAll').onclick = () => { $('#histWrap').innerHTML = historyHTML(!showAll); bindHistory(!showAll); };
+  if ($('#histClear')) $('#histClear').onclick = () => {
+    if (!confirm('Al je opgeslagen resultaten en fouten wissen? Dit kun je niet ongedaan maken.')) return;
+    store.set('hist', []); store.set('best', {}); store.set('wrong', []); renderHome();
+  };
+}
+
 /* ---------- Home ---------- */
 function renderHome(){
   $('#app').classList.remove('narrow');
   stopTimer(); S = null;
   $('#barRight').innerHTML = '';
-  const best = store.get('best', {});
   const wrong = store.get('wrong', []);
   const timedPref = store.get('timed', false);
   $('#app').innerHTML = `
@@ -296,7 +348,7 @@ function renderHome(){
     <div class="versions">
       ${[1,2,3,4,5].map(v => `<button class="vbtn" data-v="${v}">
         <span class="vnum">${v}</span>
-        <span class="vtxt"><b>Oefentoets<span class="vn"> ${v}</span></b><span>80 vragen</span>${best['v'+v] != null ? `<span class="best">Beste cijfer ${fmt(best['v'+v])}</span>` : ''}</span>
+        <span class="vtxt"><b>Oefentoets<span class="vn"> ${v}</span></b>${(st => st ? `<span>${st.n ? `${st.n}× gemaakt` : 'Gemaakt'}</span><span class="vscore">${st.last != null && st.n > 1 ? `Laatst <i class="${gradeCls(st.last)}">${fmt(st.last)}</i> · ` : ''}Beste <i class="${gradeCls(st.best)}">${fmt(st.best)}</i></span>` : '<span>Nog niet gemaakt</span>')(versionStats(v))}</span>
       </button>`).join('')}
     </div>
     <div class="opts"><label><input type="checkbox" id="timed" ${timedPref ? 'checked' : ''}> Met tijdslimiet van 60 minuten, zoals bij het echte tentamen</label></div>
@@ -313,6 +365,8 @@ function renderHome(){
       ${CATS.map(c => `<button class="catbtn" data-c="${c.id}" style="--cc:${c.color}"><strong>${c.name}</strong><span>Vragen uit alle vijf de oefentoetsen</span></button>`).join('')}
     </div>
 
+    <div id="histWrap">${historyHTML(false)}</div>
+
     <h2>Over het echte tentamen</h2>
     <div class="exam">
       <span>Digitaal in het computerlokaal, 60 minuten, 80 meerkeuzevragen:</span>
@@ -322,10 +376,11 @@ function renderHome(){
 
     <p class="note">De uitleg bij de antwoorden is als hulp toegevoegd en komt niet van de docent. Het antwoordenblad van de opleiding blijft leidend. Je voortgang wordt alleen in deze browser bewaard.</p>
   `;
+  bindHistory(false);
   $('#timed').onchange = e => store.set('timed', e.target.checked);
   document.querySelectorAll('.vbtn').forEach(b => b.onclick = () => {
     const v = +b.dataset.v;
-    startSession({ title: 'Versie ' + v, key: 'v' + v, questions: DATA.filter(q => q.v === v), timed: $('#timed').checked });
+    startSession({ title: 'Oefentoets ' + v, key: 'v' + v, questions: DATA.filter(q => q.v === v), timed: $('#timed').checked });
   });
   $('#mixed').onclick = () => startSession({ title: 'Gemixte toets', key: 'mix', questions: buildMixed(), timed: $('#timed').checked });
   if ($('#retry')) $('#retry').onclick = () => {
@@ -444,8 +499,9 @@ function finish(){
   const correct = qs.filter((q, i) => S.answers[i] === q.a).length;
   const grade = gradeFor(correct, total);
 
-  // remember best score per version and the questions answered wrong
-  if (/^v\d$/.test(S.key)) { const best = store.get('best', {}); if (best[S.key] == null || grade > best[S.key]) best[S.key] = grade; store.set('best', best); }
+  // remember this attempt (with answers, so it can be reviewed later) and the questions answered wrong
+  saveAttempt({ t: Date.now(), key: S.key, title: S.title, practice: S.practice, correct, total, grade,
+                ids: qs.map(q => q.id), ans: S.answers.map(a => a == null ? null : a) });
   const wrong = new Set(store.get('wrong', []));
   qs.forEach((q, i) => { if (S.answers[i] === q.a) wrong.delete(q.id); else if (S.answers[i] != null) wrong.add(q.id); });
   store.set('wrong', [...wrong]);
@@ -463,7 +519,7 @@ function renderResults(correct, total, grade){
   }).filter(r => r.n);
   const pass = grade >= 5.5;
   $('#app').innerHTML = `
-    <div class="results-top"><div><p class="qnum" style="margin:0">${esc(S.title)}</p>
+    <div class="results-top"><div><p class="qnum" style="margin:0">${esc(S.title)}${S.when ? ` <span style="color:var(--ink-2);font-weight:500">· gemaakt op ${fmtDate(S.when)}</span>` : ''}</p>
     <div class="score">
       <div class="grade ${pass ? 'pass' : ''}">${fmt(grade)}</div>
       <div class="score-txt"><b>${correct} van ${total} goed</b><span>${pass ? 'Voldoende, je zou geslaagd zijn.' : 'Nog niet voldoende. Je hebt minimaal 57 van de 80 goed nodig (71%).'}${total !== 80 ? ' Cijfer omgerekend naar een toets van 80 vragen.' : ''}</span></div>
