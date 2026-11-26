@@ -11,8 +11,13 @@ Oefenapp voor de toets Basis Nederlands van Rotterdam Academy (Hogeschool Rotter
 - Eén onderdeel apart oefenen: werkwoordspelling, zinsopbouw, taalgebruik of spelling
 - Na afloop je cijfer en score per onderdeel zien, en bij elke vraag uitleg waarom het goede antwoord goed is
 - Je fouten later opnieuw oefenen
+- Een toets opnieuw beginnen of na afloop nog een keer maken
+- Je eerdere resultaten terugzien en opnieuw nakijken
+- Lichte of donkere modus
 
 Werkt in elke browser, op de computer en op je telefoon. Tip: zet de link op je beginscherm, dan werkt het als een app.
+
+Op de computer kun je ook met het toetsenbord werken: **a/b/c** (of 1/2/3) kiest een antwoord, **Enter** of **→** gaat naar de volgende vraag, **←** naar de vorige.
 
 ## Over de inhoud
 
