@@ -48,10 +48,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .logo small{display:block;font-weight:500;font-size:.78rem;opacity:.9}
 .bar-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums;font-weight:600}
 .bar-btn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:6px;padding:6px 12px;font-size:.9rem;font-weight:600}
-@media (hover:hover){.theme-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.theme-btn svg{width:18px;height:18px;flex:none}
-@media (max-width:480px){.theme-btn .lbl{display:none}}
-.bar-btn:hover{background:rgba(255,255,255,.28)}}
+.bar-btn{transition:background .15s,transform .12s}
+.bar-btn:active{transform:scale(.94)}
+@media (hover:hover){.bar-btn:hover{background:rgba(255,255,255,.28)}}
+/* theme + icon buttons: fixed size, so light and dark look identical */
+.theme-btn,.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;line-height:1;height:34px;flex:none}
+.theme-btn svg,.icon-btn svg{width:18px;height:18px;flex:none;display:block}
+.theme-btn .lbl{display:inline-grid}
+.theme-btn .lbl>span{grid-area:1/1}
+.theme-btn .lbl>.off{visibility:hidden}
+.icon-btn{width:36px;padding:0}
+@media (max-width:480px){.theme-btn .lbl{display:none}.theme-btn{width:36px;padding:0}}
+.theme-btn.spin svg{animation:spin .5s cubic-bezier(.2,.8,.2,1)}
+.icon-btn.spin svg{animation:spinBack .5s cubic-bezier(.2,.8,.2,1)}
 .timer.low{background:#fff;color:var(--red-dark);border-radius:6px;padding:2px 8px}
 
 main{max-width:var(--w);margin:0 auto;padding:clamp(20px,3vw,36px) var(--pad) 120px}
@@ -150,8 +159,7 @@ i.pass,.hgrade.pass{color:var(--ok)} i.fail,.hgrade.fail{color:var(--bad)}
 .gridbtn{font-variant-numeric:tabular-nums}
 
 /* Question overview sheet */
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:none;align-items:flex-end;justify-content:center}
-.sheet.open{display:flex}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;align-items:flex-end;justify-content:center}
 .sheet-in{background:var(--paper);width:100%;max-width:980px;max-height:80vh;overflow:auto;border-radius:14px 14px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .dots{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
@@ -190,7 +198,69 @@ i.pass,.hgrade.pass{color:var(--ok)} i.fail,.hgrade.fail{color:var(--bad)}
 .why b{display:block;font-size:.8rem;color:var(--ink-2);margin-bottom:2px}
 .empty-state{padding:24px;text-align:center;color:var(--ink-2);background:var(--paper);border-radius:10px;border:1px dashed var(--line)}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---------- Motion ---------- */
+html{overflow-x:clip}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideFromRight{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes slideFromLeft{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes softPop{0%{transform:scale(1)}40%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes slotIn{from{opacity:0;transform:translateY(-8px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes gradeIn{0%{opacity:0;transform:scale(.6)}70%{transform:scale(1.06)}100%{opacity:1;transform:none}}
+@keyframes navIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes spin{from{transform:rotate(-120deg) scale(.6);opacity:.2}to{transform:none;opacity:1}}
+@keyframes spinBack{from{transform:rotate(0)}to{transform:rotate(-360deg)}}
+@keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+#app.in-up{animation:fadeUp .4s cubic-bezier(.2,.7,.2,1)}
+#app.in-next{animation:slideFromRight .3s cubic-bezier(.2,.7,.2,1)}
+#app.in-prev{animation:slideFromLeft .3s cubic-bezier(.2,.7,.2,1)}
+.stagger>*{animation:fadeUp .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 45ms)}
+
+/* cards lift a little on hover, press down on tap */
+.vbtn,.mixbtn,.catbtn,.hrow{transition:border-color .15s,background .15s,transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s}
+@media (hover:hover){.vbtn:hover,.mixbtn:hover,.catbtn:hover,.hrow:hover{transform:translateY(-3px);box-shadow:0 8px 20px -10px rgba(0,0,0,.35)}}
+.vbtn:active,.mixbtn:active,.catbtn:active,.hrow:active{transform:scale(.98);box-shadow:none}
+.vnum,.mixbtn .ico{transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+@media (hover:hover){.vbtn:hover .vnum,.mixbtn:hover .ico{transform:rotate(-6deg) scale(1.08)}}
+.btn{transition:border-color .15s,background .15s,transform .12s,opacity .2s}
+.btn:active:not(:disabled){transform:scale(.97)}
+.filter button,.linkbtn{transition:background .15s,color .15s,border-color .15s,transform .12s}
+.filter button:active{transform:scale(.95)}
+
+/* quiz */
+.choice{transition:border-color .15s,background .15s,transform .12s}
+.choice:active:not(:disabled){transform:scale(.985)}
+.choice .k{transition:background .15s,border-color .15s,color .15s}
+.choice.just .k{animation:pop .35s cubic-bezier(.3,1.4,.5,1)}
+.slot.pop{animation:slotIn .3s cubic-bezier(.2,.8,.2,1)}
+.choice.right.anim{animation:softPop .45s cubic-bezier(.3,1.4,.5,1)}
+.choice.right.anim .k{animation:pop .45s cubic-bezier(.3,1.4,.5,1)}
+.choice.wrong.anim{animation:shake .4s ease}
+.feedback.anim{animation:fadeUp .35s cubic-bezier(.2,.7,.2,1) both;animation-delay:.08s}
+.progress i{transition:width .45s cubic-bezier(.2,.7,.2,1)}
+.nav{animation:navIn .3s cubic-bezier(.2,.7,.2,1)}
+.gridbtn.bump{animation:countPop .3s ease}
+
+/* overview sheet: backdrop fades, panel slides up */
+.sheet{display:flex;visibility:hidden;opacity:0;transition:opacity .25s,visibility 0s linear .3s}
+.sheet.open{visibility:visible;opacity:1;transition:opacity .25s}
+.sheet-in{transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.sheet.open .sheet-in{transform:none}
+.dot{transition:transform .12s,background .15s}
+.dot:active{transform:scale(.92)}
+
+/* results */
+.grade.anim{animation:gradeIn .6s cubic-bezier(.2,.8,.2,1) both}
+.meter i{transition:width .9s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 90ms + .15s)}
+.review>*{animation:fadeUp .35s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 35ms)}
+
+/* smooth colour change when switching theme */
+html.theme-anim,html.theme-anim *,html.theme-anim *::before{transition:background-color .35s ease,border-color .35s ease,color .35s ease,fill .35s ease!important}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -203,6 +273,30 @@ i.pass,.hgrade.pass{color:var(--ok)} i.fail,.hgrade.fail{color:var(--bad)}
 
 <script>
 
+/* ---------- motion helpers ---------- */
+const reduceMotion = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+// (re)start a CSS animation by toggling a class
+function replayAnim(el, cls){ if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+// page-level entrance: 'up' (new screen), 'next' / 'prev' (question to question)
+function enter(dir){
+  const app = document.getElementById('app');
+  app.classList.remove('in-up', 'in-next', 'in-prev');
+  if (!dir) return;
+  void app.offsetWidth; app.classList.add('in-' + dir);
+}
+// give children of a container an index so they appear one after another
+function stagger(sel, max = 12){ document.querySelectorAll(sel).forEach(box => [...box.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, max)))); }
+// count a number up from `from` to `to`
+function countUp(el, from, to, ms, format){
+  if (!el) return;
+  if (reduceMotion()) { el.textContent = format(to); return; }
+  const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = format(from + (to - from) * e); if (p < 1) requestAnimationFrame(step); };
+  el.textContent = format(from); requestAnimationFrame(step);
+}
+const RESTART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>';
+
 /* ---------- light / dark theme ---------- */
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
 const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>';
@@ -211,15 +305,19 @@ const curTheme = () => document.documentElement.dataset.theme || (sysDark() ? 'd
 function paintThemeBtn(){
   const dark = curTheme() === 'dark';
   const b = document.getElementById('themeBtn');
-  b.innerHTML = (dark ? SUN : MOON) + `<span class="lbl">${dark ? 'Licht' : 'Donker'}</span>`;
+  // both labels are always rendered on top of each other, so the button never changes width
+  b.innerHTML = (dark ? SUN : MOON) + `<span class="lbl"><span class="${dark ? '' : 'off'}">Licht</span><span class="${dark ? 'off' : ''}">Donker</span></span>`;
   b.setAttribute('aria-label', dark ? 'Schakel naar lichte modus' : 'Schakel naar donkere modus');
   b.title = b.getAttribute('aria-label');
 }
 function setTheme(t){
-  document.documentElement.dataset.theme = t;
+  const html = document.documentElement;
+  if (!reduceMotion()) { html.classList.add('theme-anim'); clearTimeout(setTheme.tid); setTheme.tid = setTimeout(() => html.classList.remove('theme-anim'), 450); }
+  html.dataset.theme = t;
   try { localStorage.setItem('bn_theme', t); } catch(e){}
   const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === 'dark' ? '#FF2D43' : '#E2001A';
   paintThemeBtn();
+  replayAnim(document.getElementById('themeBtn'), 'spin');
 }
 document.getElementById('themeBtn').onclick = () => setTheme(curTheme() === 'dark' ? 'light' : 'dark');
 if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', paintThemeBtn);
@@ -270,8 +368,9 @@ function startSession({title, questions, key, timed, practice}){
   S = { title, key, questions, answers: Array(questions.length).fill(null), i: 0,
         timed: !!timed, practice: !!practice, revealed: Array(questions.length).fill(false),
         ends: timed ? Date.now() + 60*60*1000 * questions.length / 80 : null, done: false };
-  renderQuiz();
+  renderQuiz('up');
   tick();
+  window.scrollTo(0, 0);
 }
 
 /* Build a new mixed test: same structure as the real exam (30/20/20/10), drawn from all 400 questions,
@@ -290,6 +389,19 @@ function buildCategory(cid, size){
   const seen = new Set(); const pick = [];
   for (const q of shuffle(DATA.filter(q => q.c === cid))) { if (seen.has(q.s)) continue; seen.add(q.s); pick.push(q); if (pick.length === size) break; }
   return pick;
+}
+
+/* Start the same test again with the same questions and a clean slate. */
+function restartSession(){
+  if (!S) return;
+  const timed = S.timed != null ? S.timed : (!S.practice && store.get('timed', false));
+  const nav = $('.nav'); if (nav) nav.remove();
+  startSession({ title: S.title, key: S.key, questions: S.questions, timed, practice: S.practice });
+}
+function confirmRestart(){
+  if (S && !S.done && S.answers.some(a => a != null) && !confirm('Opnieuw beginnen? Je antwoorden van deze poging worden gewist.')) return;
+  replayAnim($('#restart'), 'spin');
+  restartSession();
 }
 
 /* ---------- History (stored per browser) ---------- */
@@ -327,7 +439,7 @@ function historyHTML(showAll){
 }
 function bindHistory(showAll){
   document.querySelectorAll('.hrow').forEach(b => b.onclick = () => openAttempt(+b.dataset.i));
-  if ($('#histAll')) $('#histAll').onclick = () => { $('#histWrap').innerHTML = historyHTML(!showAll); bindHistory(!showAll); };
+  if ($('#histAll')) $('#histAll').onclick = () => { $('#histWrap').innerHTML = historyHTML(!showAll); stagger('.hist', 20); bindHistory(!showAll); };
   if ($('#histClear')) $('#histClear').onclick = () => {
     if (!confirm('Al je opgeslagen resultaten en fouten wissen? Dit kun je niet ongedaan maken.')) return;
     store.set('hist', []); store.set('best', {}); store.set('wrong', []); renderHome();
@@ -377,6 +489,8 @@ function renderHome(){
     <p class="note">De uitleg bij de antwoorden is als hulp toegevoegd en komt niet van de docent. Het antwoordenblad van de opleiding blijft leidend. Je voortgang wordt alleen in deze browser bewaard.</p>
   `;
   bindHistory(false);
+  enter('up');
+  stagger('.versions, .mix, .cats, .hist');
   $('#timed').onchange = e => store.set('timed', e.target.checked);
   document.querySelectorAll('.vbtn').forEach(b => b.onclick = () => {
     const v = +b.dataset.v;
@@ -397,11 +511,16 @@ function renderHome(){
 function renderBar(){
   const answered = S.answers.filter(a => a != null).length;
   $('#barRight').innerHTML = `${S.timed ? `<span class="timer" id="timer"></span>` : ''}
+    <button class="bar-btn icon-btn" id="restart" type="button" aria-label="Opnieuw beginnen" title="Opnieuw beginnen">${RESTART}</button>
     <button class="bar-btn gridbtn" id="openSheet" aria-label="Overzicht van de vragen">${answered}/${S.questions.length}</button>`;
   $('#openSheet').onclick = openSheet;
+  $('#restart').onclick = confirmRestart;
+  if (S.lastAnswered != null && answered !== S.lastAnswered) replayAnim($('#openSheet'), 'bump');
+  S.lastAnswered = answered;
   updateTimer();
 }
-function renderQuiz(){
+/* anim: 'up' | 'next' | 'prev' (new question), 'choose' (answer picked), 'reveal' (answer checked) */
+function renderQuiz(anim){
   $('#app').classList.add('narrow');
   const q = S.questions[S.i], c = CAT[q.c], a = S.answers[S.i];
   const shown = S.practice && S.revealed[S.i];
@@ -410,7 +529,7 @@ function renderQuiz(){
     <div class="qmeta"><span class="qnum">Vraag ${S.i + 1} van ${S.questions.length}</span>
       <span class="tag" style="--cc:${c.color}">${c.name}</span>
       <span>${[S.title === c.name ? '' : esc(S.title), S.key !== 'v'+q.v ? `versie ${q.v}, vraag ${q.n}` : ''].filter(Boolean).join(' · ')}</span></div>
-    <div class="progress"><i style="width:${(S.i + 1) / S.questions.length * 100}%"></i></div>
+    <div class="progress"><i style="width:${S.pct != null ? S.pct : 0}%"></i></div>
     <div class="sentence ${shown ? 'revealed' : ''}">${sentenceHTML(q, shown ? q.o[q.a] : (a != null ? q.o[a] : null))}</div>
     <p class="instr">${esc(q.i)}</p>
     <div class="choices">${q.o.map((o, k) => {
@@ -422,6 +541,21 @@ function renderQuiz(){
   `;
   document.querySelectorAll('.choice').forEach(b => b.onclick = () => choose(+b.dataset.k));
   renderNav();
+
+  // progress bar glides from the previous position to the new one
+  const pct = (S.i + 1) / S.questions.length * 100, bar = $('.progress i');
+  void bar.offsetWidth; bar.style.width = pct + '%'; S.pct = pct;
+
+  if (anim === 'up' || anim === 'next' || anim === 'prev') enter(anim);
+  else enter(null);
+  if (anim === 'choose') {
+    replayAnim($(`.choice[data-k="${a}"]`), 'just');
+    replayAnim($('.sentence .slot'), 'pop');
+  }
+  if (anim === 'reveal') {
+    document.querySelectorAll('.choice.right, .choice.wrong').forEach(el => replayAnim(el, 'anim'));
+    replayAnim($('.feedback'), 'anim');
+  }
 }
 function renderNav(){
   let nav = $('.nav');
@@ -444,17 +578,17 @@ function renderNav(){
 function choose(k){
   if (S.practice && S.revealed[S.i]) return;
   S.answers[S.i] = k;
-  renderQuiz();
+  renderQuiz('choose');
   if (!S.practice && S.i < S.questions.length - 1) {
     clearTimeout(S.adv);
     S.adv = setTimeout(() => { if (S && !S.done && S.answers[S.i] === k) go(S.i + 1); }, 450);
   }
 }
 function next(){
-  if (S.practice && !S.revealed[S.i]) { if (S.answers[S.i] == null) return; S.revealed[S.i] = true; renderQuiz(); return; }
+  if (S.practice && !S.revealed[S.i]) { if (S.answers[S.i] == null) return; S.revealed[S.i] = true; renderQuiz('reveal'); return; }
   if (S.i < S.questions.length - 1) go(S.i + 1); else confirmFinish();
 }
-function go(i){ clearTimeout(S.adv); if (i < 0 || i >= S.questions.length) return; S.i = i; renderQuiz(); window.scrollTo(0, 0); }
+function go(i){ clearTimeout(S.adv); if (i < 0 || i >= S.questions.length || i === S.i) return; const dir = i > S.i ? 'next' : 'prev'; S.i = i; renderQuiz(dir); window.scrollTo(0, 0); }
 function confirmFinish(){
   const open = S.answers.filter(a => a == null).length;
   if (open && !confirm(`Je hebt nog ${open} ${open === 1 ? 'vraag' : 'vragen'} niet beantwoord. Toch inleveren?`)) return;
@@ -464,7 +598,7 @@ function confirmFinish(){
 /* ---------- Overview sheet ---------- */
 function openSheet(){
   const showRes = S.practice;
-  $('#sheetIn').innerHTML = `<div class="sheet-head"><strong>Overzicht</strong><button class="btn" id="closeSheet">Sluiten</button></div>
+  $('#sheetIn').innerHTML = `<div class="sheet-head"><strong>Overzicht</strong><span style="display:flex;gap:8px"><button class="btn" id="sheetRestart" style="white-space:nowrap">↺ Opnieuw</button><button class="btn" id="closeSheet">Sluiten</button></span></div>
     <div class="dots">${S.questions.map((q, i) => {
       let cls = S.answers[i] != null ? 'done' : '';
       if (showRes && S.revealed[i]) cls = S.answers[i] === q.a ? 'r' : 'w';
@@ -474,6 +608,7 @@ function openSheet(){
     <p class="legend">Grijs is beantwoord. Het gekleurde streepje onderaan geeft het onderdeel aan: ${CATS.map(c => `<span style="color:${c.color};font-weight:700">${c.name}</span>`).join(', ')}.</p>`;
   $('#sheet').classList.add('open');
   $('#closeSheet').onclick = closeSheet;
+  $('#sheetRestart').onclick = () => { closeSheet(); confirmRestart(); };
   document.querySelectorAll('.dot').forEach(b => b.onclick = () => { closeSheet(); go(+b.dataset.i); });
 }
 function closeSheet(){ $('#sheet').classList.remove('open'); }
@@ -521,13 +656,14 @@ function renderResults(correct, total, grade){
   $('#app').innerHTML = `
     <div class="results-top"><div><p class="qnum" style="margin:0">${esc(S.title)}${S.when ? ` <span style="color:var(--ink-2);font-weight:500">· gemaakt op ${fmtDate(S.when)}</span>` : ''}</p>
     <div class="score">
-      <div class="grade ${pass ? 'pass' : ''}">${fmt(grade)}</div>
+      <div class="grade anim ${pass ? 'pass' : ''}" id="grade">${fmt(grade)}</div>
       <div class="score-txt"><b>${correct} van ${total} goed</b><span>${pass ? 'Voldoende, je zou geslaagd zijn.' : 'Nog niet voldoende. Je hebt minimaal 57 van de 80 goed nodig (71%).'}${total !== 80 ? ' Cijfer omgerekend naar een toets van 80 vragen.' : ''}</span></div>
     </div>
     </div><div><h2>Per onderdeel</h2>
-    <div class="catrows">${per.map(r => `<div class="catrow" style="--cc:${r.c.color}"><span>${r.c.name}</span><div class="meter"><i style="width:${r.ok / r.n * 100}%"></i></div><span class="n">${r.ok}/${r.n}</span></div>`).join('')}</div></div></div>
+    <div class="catrows">${per.map(r => `<div class="catrow" style="--cc:${r.c.color}"><span>${r.c.name}</span><div class="meter"><i style="width:0" data-w="${r.ok / r.n * 100}"></i></div><span class="n">${r.ok}/${r.n}</span></div>`).join('')}</div></div></div>
     <div class="actions">
       ${correct < total ? `<button class="btn primary" id="again">Oefen deze ${total - correct} fouten opnieuw</button>` : ''}
+      <button class="btn ${correct < total ? '' : 'primary'}" id="redo">Maak deze toets opnieuw</button>
       <button class="btn" id="toHome">Terug naar het overzicht</button>
     </div>
     <h2>Nakijken</h2>
@@ -538,6 +674,16 @@ function renderResults(correct, total, grade){
     </div>
     <div class="review" id="review"></div>`;
   renderReview();
+  enter('up');
+  // grade counts up, meters fill one after another
+  countUp($('#grade'), 1, grade, 900, fmt);
+  const meters = document.querySelectorAll('.meter i');
+  meters.forEach(m => m.offsetWidth);
+  meters.forEach((m, i) => { m.style.setProperty('--i', i); m.style.width = m.dataset.w + '%'; });
+  $('#redo').onclick = () => {
+    if (S.key.startsWith('v')) S.questions = DATA.filter(q => q.v === +S.key.slice(1));
+    restartSession();
+  };
   document.querySelectorAll('.filter button').forEach(b => b.onclick = () => {
     S.filter = b.dataset.f;
     document.querySelectorAll('.filter button').forEach(x => x.setAttribute('aria-pressed', x === b));
@@ -568,6 +714,7 @@ function renderReview(){
       <div class="why"><b>Waarom</b>${esc(q.x)}</div>
     </article>`;
   }).join('') : `<div class="empty-state">Geen fouten in dit onderdeel. Mooi zo.</div>`;
+  stagger('#review', 10);
 }
 
 /* ---------- Keyboard ---------- */
